@@ -1,23 +1,19 @@
 """
 Данная программа представляет собой скрипт создания и обучения нейронной сети архитектуры ColorNet
 В аргументы запуска скрипта подается путь к обучающей выборке
-Импорт библиотек, sys, os, random, time,
-Image (библиотека Pillow), numpy, color (из библиотеки skimage),
-Adam, Conv2, UpSampling2D, Input, BatchNormalizationV2, Conv2DTranspose, Model, BackupAndRestore, CSVLogger
-из библиотеки keras (tensorflow)
 """
-import os
-import sys
-import random
-import time
+import os  # Импорт модуля os для работы с операционной системой
+import sys  # Импорт модуля sys для работы с системными параметрами и функциями
+import random  # Импорт модуля random для работы с генерацией случайных чисел
+import time  # Импорт модуля time для работы с функциями времени
 
-from keras.optimizers import Adam
-from keras.layers import Conv2D, UpSampling2D, Input, BatchNormalizationV2, Conv2DTranspose
-from keras.models import Model
-from keras.callbacks import BackupAndRestore, CSVLogger
-from skimage import color
-import numpy
-from PIL import Image
+from keras.optimizers import Adam  # Импорт класса Adam из модуля optimizers из пакета keras для оптимизации модели
+from keras.layers import Conv2D, UpSampling2D, Input, BatchNormalizationV2, Conv2DTranspose  # Импорт определенных классов из модуля layers из пакета keras для создания слоев модели
+from keras.models import Model  # Импорт класса Model из модуля models из пакета keras для создания модели
+from keras.callbacks import BackupAndRestore, CSVLogger  # Импорт определенных классов из модуля callbacks из пакета keras для обратных вызовов во время обучения модели
+from skimage import color  # Импорт модуля color из пакета skimage (Scikit-Image) для работы с цветовыми пространствами
+import numpy  # Импорт модуля numpy для работы с массивами
+from PIL import Image  # Импорт класса Image из модуля PIL (Python Imaging Library) для работы с изображениями
 
 directory = os.getcwd()  # Получаем текущую рабочую директорию
 
