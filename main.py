@@ -14,6 +14,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, \
 # matplotlib
 from tensorflow import keras  # Импорт модуля keras из пакета tensorflow
 from keras.optimizers import Adam  # Импорт класса Adam из модуля optimizers из пакета keras
+from matplotlib import backend_bases
 
 MODEL_PATH = "model.h5"  # Путь к файлу модели
 IMAGE_WIDTH = 256  # Ширина изображения
@@ -50,12 +51,12 @@ def select_image():
                    ('PNG', '.png'), ('JPE', '.jpe'), ('BMP', '.bmp')]
     )
     if answer:  # Если пользователь выбрал файл
-        label_selected = tk.Label(master=window, text="Выбрано: " + answer)  # Создание виджета Label для отображения
-        # пути выбранного файла
-        label_selected.pack(pady=(0, 80))  # Размещение виджета на главном окне с отступом
-        draw_button = tk.Button(master=window, command=lambda: colorize_image(answer), text="Раскрасить")
-        # Создание кнопки для вызова функции раскрашивания изображения
-        draw_button['font'] = button_font  # Настройка шрифта кнопки
+        destroy_all_and_create_default()  # Сброс виджетов на форме и создание стандартной кнопки "Выбрать изображение"
+        selected_label = tk.Label(master=window, text="Выбрано: " + answer, font=font_settings, bg="white")
+        # Создание виджета Label для отображения пути выбранного файла
+        selected_label.pack(pady=(0, 80))  # Размещение виджета на главном окне с отступом
+        draw_button = tk.Button(master=window, command=lambda: colorize_image(answer), text="Раскрасить",
+                                font=font_settings)  # Создание кнопки для вызова функции раскрашивания изображения
         draw_button.pack(pady=(0, 80))  # Размещение кнопки на главном окне с отступом
 
 
@@ -68,31 +69,27 @@ def destroy_all():
 # Функция удаления всех виджетов и создания кнопки по умолчанию "Выбрать изображение"
 def destroy_all_and_create_default():
     destroy_all()
-    def_button()
+    default_widgets()
 
 
 # Функция создания кнопки "Выбрать изображение", которая открывает пользователю выбор изображения для раскраски
-def def_button():
+def default_widgets():
+    header_label = tk.Label(master=window, text="Раскрашивание чёрно-белых изображений с помощью нейронной сети",
+                            font=font_settings, bg="white")
+    # Создание виджета Label для отображения названия приложения
+    header_label.pack(pady=(0, 80))  # Размещение виджета на главном окне с отступом
     select_button = tk.Button(
         master=window,
         command=select_image,
         text="Выбрать изображение",
-        font=button_font
-    )
-    select_button.pack(pady=(100, 20))
+        font=font_settings
+    )  # Создание виджета Button
+    select_button.pack(pady=(100, 20))  # Размещение виджета на главном окне с отступом
 
 
 # Функция раскрашивания изображения, параметр - путь к изображению
 def colorize_image(path):
     destroy_all()  # Удаление всех виджетов на главном окне
-    #  Создание кнопки "Другое изображение", которая позволяет выбрать другое изображение для раскрашивания
-    back_button = tk.Button(
-        master=window,
-        command=destroy_all_and_create_default,
-        text="Другое изображение",
-        font=button_font
-    )
-    back_button.pack(pady=(0, 0))
 
     # Создание полотна Canvas для отображения pyplot
     canvas = tk.Canvas(window, bg='white')
@@ -125,7 +122,7 @@ def colorize_image(path):
     color_img = Image.fromarray(
         np.uint8(color.lab2rgb(result) * 255))  # Преобразование результирующего изображения в RGB
 
-    plot_figure = Figure(figsize=(6, 3), dpi=300)  # Создание фигуры для графиков
+    plot_figure = Figure(figsize=(6, 2), dpi=300)  # Создание фигуры для графиков
     # Создание первого подграфика и отображение изображения
     plot1 = plot_figure.add_subplot(1, 3, 1)
     plot1.imshow(image.resize((orig_x, orig_y)))
@@ -156,7 +153,16 @@ def colorize_image(path):
     # Создание объекта FigureCanvasTkAgg и отрисовка изображения на холсте
     output = FigureCanvasTkAgg(plot_figure, master=canvas)
     output.draw()
-    output.get_tk_widget().pack(expand=True)
+    output.get_tk_widget().pack()
+
+    #  Создание кнопки "Вернуться назад", которая позволяет выбрать другое изображение для раскрашивания
+    back_button = tk.Button(
+        master=window,
+        command=destroy_all_and_create_default,
+        text="Вернуться назад",
+        font=font_settings
+    )
+    back_button.pack(pady=(0, 0))
 
     # Создание панели инструментов и ее размещение на окне
     toolbar = NavigationToolbar2Tk(output, window)
@@ -166,13 +172,15 @@ def colorize_image(path):
 
 window = tk.Tk()  # Создание главного окна приложения
 window.title("Раскрашивание чёрно-белых изображений с помощью нейронной сети")  # Установка заголовка окна
-window.geometry('1920x1080')  # Установка размеров окна
+window.geometry('1080x720')  # Установка размеров окна
 window.minsize(1080, 720)  # Установка минимальных размеров окна
 window['bg'] = "white"  # Установка фона окна
+backend_bases.NavigationToolbar2.toolitems = (
+    ('Сохранить', 'Сохранить изображения', 'filesave', 'save_figure'),
+)  # Установка списка инструментов для панели навигации
+font_settings = font.Font(family='Comic Sans', size=22, weight="bold")  # Создание шрифта для кнопок
 
-button_font = font.Font(family='Comic Sans', size=25, weight="bold")  # Создание шрифта для кнопок
-
-def_button()  # Вызов функции для создания кнопок в окне
+default_widgets()  # Вызов функции для виджетов главного экрана
 
 if not os.path.isfile(MODEL_PATH):  # Проверка наличия файла модели нейронной сети
     messagebox.showinfo("Ошибка", "Модель нейронной сети не найдена. Убедитесь, что файл model.h5 лежит в одной "
@@ -182,5 +190,6 @@ else:
     model = keras.models.load_model(MODEL_PATH)  # Загрузка модели нейронной сети из файла
     adamOpti = Adam(learning_rate=0.0001)  # Создание оптимизатора Adam
     model.compile(optimizer=adamOpti, loss="mse", metrics=["accuracy"])  # Компиляция модели с выбранными параметрами
+    model.summary()
 
 window.mainloop()  # Запуск главного цикла окна приложения
